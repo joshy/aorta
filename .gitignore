@@ -102,3 +102,9 @@ ENV/
 
 # ignore data folder where the scans are
 data
+
+# mac files
+.DS_Store
+
+#vscode settings
+.vscode
