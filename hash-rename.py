@@ -4,7 +4,7 @@
 import os
 import hashlib
 
-path = '/Users/irrwitz/github/aorta/ttt/test'
+path = '/home/joshy/github/aorta/data'
 with os.scandir(path) as it:
     for entry in it:
         print(entry)
