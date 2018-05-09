@@ -11,9 +11,9 @@ class ConvBlock(nn.Module):
         self.activation = activation
 
     def forward(self, x):
-        out = self.activation(self.conv(x))
-        out = self.activation(self.conv2(out))
-        return out
+        x = self.activation(self.conv(x))
+        x = self.activation(self.conv2(x))
+        return x
 
 
 class UpBlock(nn.Module):
@@ -45,8 +45,7 @@ class UpBlock(nn.Module):
 
 class UNet(nn.Module):
     """
-    From original paper first convolution block and last upsampling
-    block are not taken because our input is smaller.
+    Original U-net.
     """
 
     def __init__(self):
