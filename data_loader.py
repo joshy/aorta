@@ -33,6 +33,6 @@ def show_image_and_mask(pair):
     ax2.set_title('Aorta Mask')
 
 
-def rescale(image, size=128):
+def resize(image, size=128):
     """ Rescales a image to given size, default 128. """
     return transform.resize(image, (size, size))
