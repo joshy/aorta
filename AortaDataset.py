@@ -1,6 +1,7 @@
 import glob
 
 import nibabel as nib
+import torch
 from skimage import transform
 from torch.utils.data import Dataset
 
@@ -26,4 +27,5 @@ class AortaDataset(Dataset):
         img = nib.load(image_file)
         img_data = img.get_data()
         slice = img_data[:, :, 0].T
-        return transform.resize(slice, (572, 572))
+        transformed = transform.resize(slice, (572, 572))
+        return torch.from_numpy(transformed).float()
