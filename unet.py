@@ -7,7 +7,7 @@ class ConvBlock(nn.Module):
     def __init__(self, in_size, out_size, kernel_size=3, activation=F.relu):
         super(ConvBlock, self).__init__()
         self.conv = nn.Conv2d(in_size, out_size, kernel_size)
-        self.conv2 = nn.Conv2d(in_size, out_size, kernel_size)
+        self.conv2 = nn.Conv2d(out_size, out_size, kernel_size)
         self.activation = activation
 
     def forward(self, x):
