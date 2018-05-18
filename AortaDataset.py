@@ -16,23 +16,35 @@ class AortaDataset(Dataset):
         pairs = list(zip(glob.glob(aorta), glob.glob(cine)))
         self.pairs = pairs
 
+        
     def __len__(self):
         return len(self.pairs)
 
+    
     def __getitem__(self, idx):
         mask, image = self.pairs[idx]
-        return self.__get_zero_slice(image), self.__get_zero_slice(mask)
+        return self._get_zero_slice(image, 572), self._groundtruth(mask, 388)
 
+    
     def _normalize(self, v):
         norm = np.linalg.norm(v)
         if norm == 0:
             return v
         return v / norm
 
-    def __get_zero_slice(self, image_file):
+    
+    def _groundtruth(self, mask, size):
+        mask = self._get_zero_slice(mask, 388)
+        foreground = np.where(mask > 0, 1, 0)
+        background = np.where(foreground == 0, 1, 0)
+        combined = np.stack((foreground, background))
+        return combined
+        
+    
+    def _get_zero_slice(self, image_file, size):
         """ Gets the first slice, transforms the array and returns it. """
         img = nib.load(image_file)
         img_data = img.get_data()
         slice = img_data[:, :, 0].T
-        transformed = transform.resize(slice, (512, 512))
+        transformed = transform.resize(slice, (size, size))
         return self._normalize(transformed)
