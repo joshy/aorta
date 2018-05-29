@@ -10,10 +10,11 @@ import numpy as np
 class AortaDataset(Dataset):
     """ Aorta Dataset helper class for pytorch. """
 
-    def __init__(self, subdir='train'):
+    def __init__(self, subdir='train', transform=None):
         aorta = './data/' + subdir + '/**/**/aorta*'
         cine = './data/' + subdir + '/**/**/4Ch*'
-        self.pairs = list(zip(glob.glob(aorta), glob.glob(cine)))
+        self.pairs = list(zip(glob.glob(cine), glob.glob(aorta)))
+        self.transform = transform
 
 
     def __len__(self):
@@ -21,8 +22,12 @@ class AortaDataset(Dataset):
 
 
     def __getitem__(self, idx):
-        mask, image = self.pairs[idx]
-        return self._get_zero_slice(image, 572), self._groundtruth(mask, 388)
+        image, mask = self.pairs[idx]
+        if self.transform:
+            image, mask = self.transform((image, mask))
+        image, mask = self._get_zero_slice(image, 572), self._get_zero_slice(mask, 388)
+
+        return image, mask
 
 
     def _normalize(self, v):
@@ -40,10 +45,17 @@ class AortaDataset(Dataset):
         return combined
 
 
+    def _load_nifti(self, image_file):
+        nifti = nib.load(image_file)
+        return nifti
+
+
     def _get_zero_slice(self, image_file, size):
         """ Gets the first slice, transforms the array and returns it. """
-        img = nib.load(image_file)
-        img_data = img.get_data()
+        nifti = self._load_nifti(image_file)
+        img_data = nifti.get_data()
+
         slice = img_data[:, :, 0].T
         transformed = transform.resize(slice, (size, size))
-        return self._normalize(transformed)
+        #return self._normalize(transformed)
+        return transformed
