@@ -11,22 +11,24 @@ class AortaDataset(Dataset):
     """ Aorta Dataset helper class for pytorch. """
 
     def __init__(self, subdir='train', transform=None):
-        aorta = './data/' + subdir + '/**/**/aorta*'
-        cine = './data/' + subdir + '/**/**/4Ch*'
+        aorta = '../data/' + subdir + '/**/**/aorta*'
+        cine = '../data/' + subdir + '/**/**/4Ch*'
         self.pairs = list(zip(glob.glob(cine), glob.glob(aorta)))
         self.transform = transform
 
-
+        
     def __len__(self):
         return len(self.pairs)
 
 
     def __getitem__(self, idx):
         image, mask = self.pairs[idx]
+        image = self._load_nifti(image)
+        mask = self._load_nifti(mask)
         if self.transform:
             image, mask = self.transform((image, mask))
-        image, mask = self._get_zero_slice(image, 572), self._get_zero_slice(mask, 388)
-
+        else:
+            image, mask = self._get_zero_slice(image, 572), self._get_zero_slice(mask, 388)
         return image, mask
 
 
@@ -47,7 +49,9 @@ class AortaDataset(Dataset):
 
     def _load_nifti(self, image_file):
         nifti = nib.load(image_file)
-        return nifti
+        img_data = nifti.get_data()
+        slice = img_data[:, :, 0].T
+        return slice
 
 
     def _get_zero_slice(self, image_file, size):
