@@ -27,8 +27,6 @@ class AortaDataset(Dataset):
         mask = self._load_nifti(mask)
         if self.transform:
             image, mask = self.transform((image, mask))
-        else:
-            image, mask = self._get_zero_slice(image, 572), self._get_zero_slice(mask, 388)
         return image, mask
 
 
